@@ -156,10 +156,10 @@ function LeaveBalanceCard() {
     0
   );
 
-  const pendingLeaves = chartData.reduce(
-    (sum, leave) => sum + leave.pending,
-    0
-  );
+  // const pendingLeaves = chartData.reduce(
+  //   (sum, leave) => sum + leave.pending,
+  //   0
+  // );
 
   const usagePercentage =
     totalLeaves > 0
