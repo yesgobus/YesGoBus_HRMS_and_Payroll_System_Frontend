@@ -28,7 +28,7 @@ function Dashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 p-3 sm:p-4 lg:p-6">
+    <div className="min-h-full w-full min-w-0 bg-gray-50">
 
       {/* Greeting */}
       <GreetingHeader employeeName={employeeName} />

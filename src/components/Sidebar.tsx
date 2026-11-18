@@ -1,6 +1,6 @@
 
-import { Link, useLocation, useNavigate } from "react-router-dom"
-import { useState } from "react"
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 import {
   LayoutDashboard,
@@ -15,65 +15,50 @@ import {
   ChevronDown,
   ChevronUp,
   Building2,
-} from "lucide-react"
+  X,
+} from "lucide-react";
 
-function Sidebar() {
-  const location = useLocation()
-  const navigate = useNavigate()
+interface SidebarProps {
+  mobileOpen: boolean;
+  onClose: () => void;
+}
 
-  const [collapsed, setCollapsed] = useState(false)
-  const [openManagement, setOpenManagement] = useState(false)
+function Sidebar({ mobileOpen, onClose }: SidebarProps) {
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  // ==================================================
-  // TEMPORARY MENU VISIBILITY
-  // Change false to true whenever you want to show them
-  // ==================================================
+  const [collapsed, setCollapsed] = useState(false);
+  const [openManagement, setOpenManagement] = useState(false);
 
-  const showPayroll = false
-  const showReports = false
-  const showSettings = false
-
-  // ==================================================
-  // GET STORED VALUE
-  // ==================================================
+  const showPayroll = false;
+  const showReports = false;
+  const showSettings = false;
 
   const getStoredValue = (key: string) => {
-    return (
-      localStorage.getItem(key) ||
-      sessionStorage.getItem(key)
-    )
-  }
-
-  // ==================================================
-  // CHECK EMPLOYEE VISIBILITY
-  // ==================================================
+    return localStorage.getItem(key) || sessionStorage.getItem(key);
+  };
 
   const getVisibleEmployees = () => {
-    const storedEmployees = getStoredValue("visibleEmployees")
+    const storedEmployees = getStoredValue("visibleEmployees");
 
-    if (!storedEmployees) {
-      return []
-    }
+    if (!storedEmployees) return [];
 
     try {
-      const parsedEmployees = JSON.parse(storedEmployees)
-
-      return Array.isArray(parsedEmployees)
-        ? parsedEmployees
-        : []
+      const parsedEmployees = JSON.parse(storedEmployees);
+      return Array.isArray(parsedEmployees) ? parsedEmployees : [];
     } catch (error) {
-      console.error("Failed to parse visible employees:", error)
-      return []
+      console.error("Failed to parse visible employees:", error);
+      return [];
     }
-  }
+  };
 
-  const visibleEmployees = getVisibleEmployees()
+  const visibleEmployees = getVisibleEmployees();
+  const canViewEmployees = visibleEmployees.length > 1;
 
-  const canViewEmployees = visibleEmployees.length > 1
-
-  // ==================================================
-  // MENU
-  // ==================================================
+  // Close mobile drawer when navigating to another page
+  useEffect(() => {
+    onClose();
+  }, [location.pathname]);
 
   const menu = [
     {
@@ -81,285 +66,188 @@ function Sidebar() {
       path: "/dashboard",
       icon: LayoutDashboard,
     },
-
     ...(canViewEmployees
-      ? [
-          {
-            name: "Employees",
-            path: "/employees",
-            icon: Users,
-          },
-        ]
+      ? [{ name: "Employees", path: "/employees", icon: Users }]
       : []),
-
     {
       name: "Attendance",
       path: "/attendance",
       icon: Clock,
     },
-
     {
       name: "Leave",
       path: "/leave",
       icon: Calendar,
     },
-
     ...(showPayroll
-      ? [
-          {
-            name: "Payroll",
-            path: "/payroll",
-            icon: Wallet,
-          },
-        ]
+      ? [{ name: "Payroll", path: "/payroll", icon: Wallet }]
       : []),
-
     ...(showReports
-      ? [
-          {
-            name: "Reports",
-            path: "/reports",
-            icon: BarChart3,
-          },
-        ]
+      ? [{ name: "Reports", path: "/reports", icon: BarChart3 }]
       : []),
-  ]
+  ];
+
+  const navigateTo = (path: string) => {
+    navigate(path);
+    onClose();
+  };
 
   return (
-    <div
-      className={`${
-        collapsed ? "w-20" : "w-60"
-      } bg-slate-900 text-white min-h-screen transition-all duration-300`}
+    <aside
+      className={`
+        fixed inset-y-0 left-0 z-50
+        h-screen shrink-0 overflow-y-auto
+        bg-slate-900 text-white
+        transition-all duration-300 ease-in-out
+        w-72
+        ${collapsed ? "md:w-20" : "md:w-60"}
+        ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
+        md:static md:translate-x-0
+      `}
     >
+      {/* LOGO */}
+      <div className="flex min-h-24 items-center justify-between border-b border-slate-700 px-5 py-5 sm:px-6">
 
-      {/* ==================================================
-          LOGO
-      ================================================== */}
+        <div className={collapsed ? "md:hidden" : ""}>
+          <p className="text-xl font-semibold sm:text-2xl">
+            RambleHR
+          </p>
+          <p className="mt-1 text-sm text-gray-400 sm:text-base">
+            Transport Pvt Ltd
+          </p>
+        </div>
 
-      <div className="p-6 border-b border-slate-700 flex items-center justify-between">
-
-        {!collapsed && (
-          <div>
-            <p className="font-semibold">
-              RambleHR
-            </p>
-
-            <p className="text-xs text-gray-400">
-              Transport Pvt Ltd
-            </p>
-          </div>
-        )}
-
+        {/* DESKTOP COLLAPSE */}
         <button
           type="button"
           onClick={() => setCollapsed(!collapsed)}
-          className="text-gray-400 hover:text-white"
+          className="hidden rounded-lg p-2 text-gray-400 transition hover:bg-slate-800 hover:text-white md:block"
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          {collapsed ? (
-            <ChevronRight size={18} />
-          ) : (
-            <ChevronLeft size={18} />
-          )}
+          {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
         </button>
 
+        {/* MOBILE CLOSE */}
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-lg p-2 text-gray-300 transition hover:bg-slate-800 hover:text-white md:hidden"
+          aria-label="Close sidebar"
+        >
+          <X size={22} />
+        </button>
       </div>
 
-      {/* ==================================================
-          MENU
-      ================================================== */}
-
-      <div className="mt-6 px-2">
-
-        {/* MAIN MENU */}
+      {/* MENU */}
+      <div className="mt-5 space-y-1 px-3 pb-8">
 
         {menu.map((item) => {
-          const Icon = item.icon
-
-          const isActive =
-            location.pathname === item.path
+          const Icon = item.icon;
+          const isActive = location.pathname === item.path;
 
           return (
             <Link
               key={item.name}
               to={item.path}
+              title={collapsed ? item.name : undefined}
               className={`
-                flex items-center gap-3
-                px-4 py-3
-                rounded-lg
-                text-sm
-                mb-1
-                transition
-
-                ${
-                  isActive
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-300 hover:bg-slate-800 hover:text-white"
+                mb-1 flex items-center gap-3 rounded-xl
+                px-4 py-3.5 text-sm transition
+                ${isActive
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-300 hover:bg-slate-800 hover:text-white"
                 }
               `}
             >
+              <Icon size={21} className="shrink-0" />
 
-              <Icon size={20} />
-
-              {!collapsed && (
-                <span>{item.name}</span>
-              )}
-
+              <span className={`${collapsed ? "md:hidden" : ""}`}>
+                {item.name}
+              </span>
             </Link>
-          )
+          );
         })}
 
-        {/* ==================================================
-            MANAGEMENT
-        ================================================== */}
-
+        {/* MANAGEMENT */}
         <div className="mt-2">
-
           <button
             type="button"
-            onClick={() =>
-              setOpenManagement(!openManagement)
-            }
+            onClick={() => setOpenManagement(!openManagement)}
             className="
-              w-full
-              flex
-              items-center
-              justify-between
-              px-4
-              py-3
-              rounded-lg
-              text-sm
-              text-gray-300
-              hover:bg-slate-800
-              hover:text-white
-              transition
+              flex w-full items-center justify-between rounded-xl
+              px-4 py-3.5 text-sm text-gray-300 transition
+              hover:bg-slate-800 hover:text-white
             "
           >
-
             <div className="flex items-center gap-3">
-
-              <Building2 size={20} />
-
-              {!collapsed && (
-                <span>Management</span>
-              )}
-
+              <Building2 size={21} className="shrink-0" />
+              <span className={collapsed ? "md:hidden" : ""}>
+                Management
+              </span>
             </div>
 
-            {!collapsed && (
-              openManagement ? (
-                <ChevronUp size={16} />
+            <span className={collapsed ? "md:hidden" : ""}>
+              {openManagement ? (
+                <ChevronUp size={17} />
               ) : (
-                <ChevronDown size={16} />
-              )
-            )}
-
+                <ChevronDown size={17} />
+              )}
+            </span>
           </button>
 
-          {/* MANAGEMENT SUB MENU */}
-
-          {openManagement && !collapsed && (
-
-            <div className="ml-8 mt-1">
-
-              {/* STRUCTURE */}
-
+          {openManagement && (
+            <div className="ml-8 mt-1 space-y-1">
               <button
                 type="button"
-                onClick={() =>
-                  navigate("/management/structure")
-                }
+                onClick={() => navigateTo("/management/structure")}
                 className={`
-                  block
-                  w-full
-                  text-left
-                  px-3
-                  py-2
-                  text-sm
-                  rounded-lg
-                  transition
-
-                  ${
-                    location.pathname === "/management/structure"
-                      ? "bg-blue-600 text-white"
-                      : "text-gray-400 hover:bg-slate-800 hover:text-white"
+                  block w-full rounded-lg px-3 py-2.5 text-left text-sm transition
+                  ${location.pathname === "/management/structure"
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-400 hover:bg-slate-800 hover:text-white"
                   }
                 `}
               >
                 Structure
               </button>
 
-              {/* EMPLOYEE INFO */}
-
               <button
                 type="button"
-                onClick={() =>
-                  navigate("/management/employees")
-                }
+                onClick={() => navigateTo("/management/employees")}
                 className={`
-                  block
-                  w-full
-                  text-left
-                  px-3
-                  py-2
-                  text-sm
-                  rounded-lg
-                  transition
-
-                  ${
-                    location.pathname === "/management/employees"
-                      ? "bg-blue-600 text-white"
-                      : "text-gray-400 hover:bg-slate-800 hover:text-white"
+                  block w-full rounded-lg px-3 py-2.5 text-left text-sm transition
+                  ${location.pathname === "/management/employees"
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-400 hover:bg-slate-800 hover:text-white"
                   }
                 `}
               >
                 Employee Info
               </button>
-
             </div>
-
           )}
-
         </div>
 
-        {/* ==================================================
-            SETTINGS
-        ================================================== */}
-
+        {/* SETTINGS */}
         {showSettings && (
           <Link
             to="/settings"
             className={`
-              flex
-              items-center
-              gap-3
-              px-4
-              py-3
-              rounded-lg
-              text-sm
-              mt-2
-              transition
-
-              ${
-                location.pathname === "/settings"
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-300 hover:bg-slate-800 hover:text-white"
+              mt-2 flex items-center gap-3 rounded-xl px-4 py-3.5
+              text-sm transition
+              ${location.pathname === "/settings"
+                ? "bg-blue-600 text-white"
+                : "text-gray-300 hover:bg-slate-800 hover:text-white"
               }
             `}
           >
-
-            <Settings size={20} />
-
-            {!collapsed && (
-              <span>Settings</span>
-            )}
-
+            <Settings size={21} />
+            <span className={collapsed ? "md:hidden" : ""}>Settings</span>
           </Link>
         )}
-
       </div>
-
-    </div>
-  )
+    </aside>
+  );
 }
 
-export default Sidebar
+export default Sidebar;

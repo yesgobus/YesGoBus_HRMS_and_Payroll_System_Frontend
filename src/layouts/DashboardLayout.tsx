@@ -1,26 +1,52 @@
 
+import { useState, useCallback } from "react";
+
 import Sidebar from "../components/Sidebar";
 import TopNavbar from "../components/TopNavbar";
 
 function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Close mobile sidebar
+  const closeMobileMenu = useCallback(() => {
+    setMobileMenuOpen(false);
+  }, []);
+
+  // Toggle mobile sidebar
+  const toggleMobileMenu = useCallback(() => {
+    setMobileMenuOpen((previous) => !previous);
+  }, []);
+
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <div className="flex h-screen w-full overflow-hidden bg-gray-50">
 
-      {/* Fixed Sidebar */}
-      <div className="h-screen shrink-0 overflow-hidden">
-        <Sidebar />
-      </div>
+      {/* MOBILE SIDEBAR OVERLAY */}
+      {mobileMenuOpen && (
+        <button
+          type="button"
+          aria-label="Close navigation menu"
+          onClick={closeMobileMenu}
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+        />
+      )}
 
-      {/* Right Content */}
-      <div className="flex min-w-0 flex-1 flex-col h-screen">
+      {/* SIDEBAR */}
+      <Sidebar
+        mobileOpen={mobileMenuOpen}
+        onClose={closeMobileMenu}
+      />
 
-        {/* Fixed Top Navbar */}
-        <div className="shrink-0">
-          <TopNavbar />
-        </div>
+      {/* RIGHT CONTENT */}
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
 
-        {/* Only this section scrolls */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden p-6">
+        {/* TOP NAVBAR */}
+        <TopNavbar
+          onMenuClick={toggleMobileMenu}
+          menuOpen={mobileMenuOpen}
+        />
+
+        {/* PAGE CONTENT */}
+        <main className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4 lg:p-6">
           {children}
         </main>
 

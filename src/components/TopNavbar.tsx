@@ -6,12 +6,18 @@ import {
   Mail,
   Phone,
   X,
+  Menu,
 } from "lucide-react";
 
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function TopNavbar() {
+interface TopNavbarProps {
+  onMenuClick: () => void;
+  menuOpen: boolean;
+}
+
+function TopNavbar({ onMenuClick, menuOpen }: TopNavbarProps) {
   const [openProfile, setOpenProfile] = useState(false);
   const [employeeName, setEmployeeName] = useState("Employee");
   const [role, setRole] = useState("Employee");
@@ -47,7 +53,6 @@ function TopNavbar() {
       setRole(storedRole);
     }
 
-    // Close profile menu when clicking outside
     const handleClickOutside = (event: MouseEvent) => {
       if (
         profileRef.current &&
@@ -72,7 +77,6 @@ function TopNavbar() {
     .join("")
     .toUpperCase();
 
-  // LOGOUT
   const handleLogout = () => {
     const storage = localStorage.getItem("employeeId")
       ? localStorage
@@ -102,49 +106,56 @@ function TopNavbar() {
     navigate("/login", { replace: true });
   };
 
-  // OPEN EMPLOYEE INFORMATION
   const handleProfileClick = () => {
     setOpenProfile(false);
     navigate("/management/employees");
   };
 
   return (
-    <div className="flex h-16 items-center justify-between border-b border-gray-100 bg-white px-4 shadow-sm sm:px-6">
+    <div className="relative z-30 flex h-16 shrink-0 items-center justify-between gap-2 border-b border-gray-100 bg-white px-3 shadow-sm sm:px-6">
 
-      {/* LEFT */}
-      <div className="flex items-center gap-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 font-semibold text-blue-600">
+      {/* LEFT SECTION */}
+      <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+
+        {/* MOBILE MENU */}
+        <button
+          type="button"
+          onClick={onMenuClick}
+          className="rounded-lg p-2 text-gray-700 transition hover:bg-gray-100 md:hidden"
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+        >
+          {menuOpen ? <X size={23} /> : <Menu size={23} />}
+        </button>
+
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-100 font-semibold text-blue-600">
           R
         </div>
 
-        <div>
-          <h1 className="text-lg font-semibold text-gray-800">
-            Employee Dashboard
-          </h1>
-        </div>
+        <h1 className="truncate text-base font-semibold text-gray-800 sm:text-lg">
+          Employee Dashboard
+        </h1>
       </div>
 
       {/* RIGHT SECTION */}
-      <div className="flex items-center gap-2 sm:gap-4">
+      <div className="flex shrink-0 items-center gap-1 sm:gap-4">
 
-        {/* CONTACT US BUTTON */}
+        {/* CONTACT US */}
         <button
           type="button"
           onClick={() => setShowContact(true)}
-          className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-blue-50 hover:text-blue-600"
+          className="flex items-center gap-1 rounded-lg px-2 py-2 text-sm font-medium text-gray-700 transition hover:bg-blue-50 hover:text-blue-600 sm:gap-2 sm:px-3"
         >
           <Mail size={17} />
-          <span>Contact Us</span>
+          <span className="hidden sm:inline">Contact Us</span>
         </button>
 
-        {/* CONTACT DETAILS MODAL */}
+        {/* CONTACT MODAL */}
         {showContact && (
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-3 sm:p-4">
 
             <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
 
-              {/* MODAL HEADER */}
-              <div className="flex items-center justify-between bg-indigo-600 p-5 text-white">
+              <div className="flex items-center justify-between bg-indigo-600 p-4 text-white sm:p-5">
                 <div>
                   <h2 className="text-lg font-bold">
                     Contact Us
@@ -164,16 +175,14 @@ function TopNavbar() {
                 </button>
               </div>
 
-              {/* CONTACT INFORMATION */}
-              <div className="space-y-4 p-6">
+              <div className="space-y-4 p-4 sm:p-6">
 
                 <p className="text-sm text-gray-500">
                   For assistance and HR-related queries, contact our support team.
                 </p>
 
-                {/* EMAIL */}
-                <div className="flex items-center gap-4 rounded-xl border border-gray-200 p-4">
-                  <div className="rounded-lg bg-indigo-50 p-3">
+                <div className="flex min-w-0 items-center gap-3 rounded-xl border border-gray-200 p-3 sm:gap-4 sm:p-4">
+                  <div className="shrink-0 rounded-lg bg-indigo-50 p-3">
                     <Mail size={22} className="text-indigo-600" />
                   </div>
 
@@ -181,15 +190,14 @@ function TopNavbar() {
                     <p className="text-xs text-gray-500">
                       Email Address
                     </p>
-                    <p className="mt-1 break-all font-semibold text-gray-800">
+                    <p className="mt-1 break-all text-sm font-semibold text-gray-800">
                       {supportEmail}
                     </p>
                   </div>
                 </div>
 
-                {/* PHONE */}
-                <div className="flex items-center gap-4 rounded-xl border border-gray-200 p-4">
-                  <div className="rounded-lg bg-green-50 p-3">
+                <div className="flex items-center gap-3 rounded-xl border border-gray-200 p-3 sm:gap-4 sm:p-4">
+                  <div className="shrink-0 rounded-lg bg-green-50 p-3">
                     <Phone size={22} className="text-green-600" />
                   </div>
 
@@ -197,13 +205,12 @@ function TopNavbar() {
                     <p className="text-xs text-gray-500">
                       Contact Number
                     </p>
-                    <p className="mt-1 font-semibold text-gray-800">
+                    <p className="mt-1 text-sm font-semibold text-gray-800">
                       {supportPhone}
                     </p>
                   </div>
                 </div>
 
-                {/* SUPPORT INFORMATION */}
                 <div className="rounded-xl bg-gray-50 p-4">
                   <h3 className="text-sm font-semibold text-gray-800">
                     HR Support
@@ -215,7 +222,6 @@ function TopNavbar() {
                   </p>
                 </div>
 
-                {/* CLOSE BUTTON */}
                 <button
                   type="button"
                   onClick={() => setShowContact(false)}
@@ -236,7 +242,7 @@ function TopNavbar() {
             type="button"
             onClick={() => setOpenProfile((previous) => !previous)}
             aria-expanded={openProfile}
-            className="flex items-center gap-2 rounded-xl p-1.5 transition hover:bg-gray-50"
+            className="flex items-center gap-1 rounded-xl p-1.5 transition hover:bg-gray-50 sm:gap-2"
           >
             <div className="hidden text-right sm:block">
               <p className="max-w-36 truncate text-sm font-medium text-gray-800">
@@ -274,7 +280,6 @@ function TopNavbar() {
                 </p>
               </div>
 
-              {/* MY PROFILE */}
               <button
                 type="button"
                 onClick={handleProfileClick}
@@ -286,7 +291,6 @@ function TopNavbar() {
 
               <div className="border-t border-gray-100" />
 
-              {/* LOGOUT */}
               <button
                 type="button"
                 onClick={handleLogout}
