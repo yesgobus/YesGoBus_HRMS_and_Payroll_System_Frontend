@@ -1,9 +1,10 @@
-import GreetingHeader from "../components/dashboard/GreetingHeader"
-import DashboardGrid from "../components/dashboard/DashboardGrid"
-import LeaveBalanceCard from "../components/dashboard/LeaveBalanceCard"
-import AttendancePunch from "../components/dashboard/AttendancePunch"
-import MonthlyOverview from "../components/dashboard/MonthlyOverview"
-import { useEffect, useState } from "react"
+
+import GreetingHeader from "../components/dashboard/GreetingHeader";
+import DashboardGrid from "../components/dashboard/DashboardGrid";
+import LeaveBalanceCard from "../components/dashboard/LeaveBalanceCard";
+import AttendancePunch from "../components/dashboard/AttendancePunch";
+import MonthlyOverview from "../components/dashboard/MonthlyOverview";
+import { useEffect, useState } from "react";
 
 function Dashboard() {
   const [employeeName, setEmployeeName] = useState("Employee");
@@ -25,8 +26,9 @@ function Dashboard() {
       }
     }
   }, []);
+
   return (
-    <div className="min-h-screen bg-gray-50 p-3 sm:p-4 lg:p-6">
+    <div className="min-h-screen w-full bg-gray-50 p-3 sm:p-4 lg:p-6">
 
       {/* Greeting */}
       <GreetingHeader employeeName={employeeName} />
@@ -34,53 +36,43 @@ function Dashboard() {
       {/* Dashboard Grid */}
       <DashboardGrid>
 
-        {/* =========================
-            ROW 1
-        ========================= */}
+        {/* ROW 1 */}
 
         {/* Attendance Punch */}
-        <div className="col-span-12 lg:col-span-4 min-w-0">
+        <div className="col-span-12 min-w-0 lg:col-span-4">
           <AttendancePunch />
         </div>
 
-         <div className="col-span-12 lg:col-span-8 min-w-0">
+        {/* Monthly Overview */}
+        <div className="col-span-12 min-w-0 lg:col-span-8">
           <MonthlyOverview />
         </div>
 
+        {/* ROW 2 */}
 
-        {/* =========================
-            ROW 2
-        ========================= */}
-
-        {/* Leave Balance */}
-        <div className="col-span-12 lg:col-span-6 min-w-0">
+        {/* Leave Balance with Pie Chart */}
+        <div className="col-span-12 min-w-0">
           <LeaveBalanceCard />
         </div>
 
+        {/* ROW 3 */}
+
         {/* Holidays */}
-        {/* <div className="col-span-12 lg:col-span-6 min-w-0">
+        {/* <div className="col-span-12 min-w-0 lg:col-span-6">
           <HolidaysCard />
         </div> */}
 
-
-        {/* =========================
-            ROW 3
-        ========================= */}
-
         {/* News */}
-        {/* <div className="col-span-12 lg:col-span-6 min-w-0">
+        {/* <div className="col-span-12 min-w-0 lg:col-span-6">
           <NewsCard />
         </div> */}
 
         {/* Quick Actions */}
-        {/* <div className="col-span-12 lg:col-span-6 min-w-0">
+        {/* <div className="col-span-12 min-w-0 lg:col-span-6">
           <QuickActionsCard />
         </div> */}
 
-
-        {/* =========================
-            ROW 4
-        ========================= */}
+        {/* ROW 4 */}
 
         {/* Monthly Statistics */}
         {/* <div className="col-span-12 min-w-0 overflow-hidden">
@@ -88,9 +80,8 @@ function Dashboard() {
         </div> */}
 
       </DashboardGrid>
-
     </div>
-  )
+  );
 }
 
-export default Dashboard
+export default Dashboard;

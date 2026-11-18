@@ -12,11 +12,12 @@ import {
 } from "lucide-react";
 
 import { loginUser } from "../../services/authService";
+import ForgotPassword from "./ForgotPassword";
 
 function LoginForm() {
   const navigate = useNavigate();
 
-  // FORM STATE
+  // LOGIN FORM STATE
   const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -25,6 +26,9 @@ function LoginForm() {
   // LOGIN STATE
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // FORGOT PASSWORD STATE
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   // LOGIN
   const handleLogin = async (
@@ -46,7 +50,7 @@ function LoginForm() {
         password
       );
 
-      // Check whether the backend returned a token
+      // Check whether backend returned a token
       if (!data.token) {
         throw new Error(
           "Authentication token was not received from the server."
@@ -58,11 +62,11 @@ function LoginForm() {
         ? localStorage
         : sessionStorage;
 
-      // Remove previous login data from both storages
       const oppositeStorage = rememberMe
         ? sessionStorage
         : localStorage;
 
+      // Remove previous login information
       const storageKeys = [
         "isLoggedIn",
         "employeeId",
@@ -104,6 +108,7 @@ function LoginForm() {
 
       // LOGIN SUCCESS
       navigate("/dashboard");
+
     } catch (err) {
       console.error("Login error:", err);
 
@@ -112,6 +117,7 @@ function LoginForm() {
           ? err.message
           : "Unable to login. Please try again."
       );
+
     } finally {
       setLoading(false);
     }
@@ -122,12 +128,26 @@ function LoginForm() {
     alert("Google Login will be connected later.");
   };
 
-  // UI
+  // FORGOT PASSWORD SCREEN
+  if (showForgotPassword) {
+    return (
+      <ForgotPassword
+        initialEmployeeId={employeeId}
+        onBack={() => {
+          setShowForgotPassword(false);
+          setError("");
+        }}
+      />
+    );
+  }
+
+  // LOGIN UI
   return (
     <div className="w-full">
 
       {/* MOBILE LOGO */}
       <div className="md:hidden flex items-center gap-3 mb-8">
+
         <div className="w-11 h-11 bg-blue-600 rounded-xl flex items-center justify-center">
           <span className="text-white text-xl font-bold">
             R
@@ -143,10 +163,12 @@ function LoginForm() {
             Transport Pvt Ltd
           </p>
         </div>
+
       </div>
 
       {/* HEADING */}
       <div className="mb-8">
+
         <h2 className="text-3xl font-bold text-slate-900">
           Welcome back 👋
         </h2>
@@ -154,6 +176,7 @@ function LoginForm() {
         <p className="text-gray-500 mt-2">
           Sign in to access your employee dashboard
         </p>
+
       </div>
 
       {/* ERROR MESSAGE */}
@@ -171,11 +194,13 @@ function LoginForm() {
 
         {/* EMPLOYEE ID */}
         <div>
+
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Employee ID
           </label>
 
           <div className="relative">
+
             <UserRound
               size={19}
               className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
@@ -193,29 +218,37 @@ function LoginForm() {
               autoComplete="username"
               className="w-full h-12 pl-11 pr-4 border border-gray-200 rounded-xl bg-gray-50 outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:opacity-60"
             />
+
           </div>
+
         </div>
 
         {/* PASSWORD */}
         <div>
+
           <div className="flex items-center justify-between mb-2">
+
             <label className="text-sm font-medium text-gray-700">
               Password
             </label>
 
+            {/* FORGOT PASSWORD */}
             <button
               type="button"
               disabled={loading}
-              onClick={() =>
-                alert("Forgot password will be connected later.")
-              }
-              className="text-sm text-blue-600 hover:text-blue-700"
+              onClick={() => {
+                setError("");
+                setShowForgotPassword(true);
+              }}
+              className="text-sm text-blue-600 hover:text-blue-700 disabled:opacity-50"
             >
               Forgot Password?
             </button>
+
           </div>
 
           <div className="relative">
+
             <LockKeyhole
               size={19}
               className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
@@ -248,11 +281,14 @@ function LoginForm() {
                 <Eye size={19} />
               )}
             </button>
+
           </div>
+
         </div>
 
         {/* REMEMBER ME */}
         <div className="flex items-center gap-2">
+
           <input
             type="checkbox"
             checked={rememberMe}
@@ -266,6 +302,7 @@ function LoginForm() {
           <span className="text-sm text-gray-600">
             Remember me
           </span>
+
         </div>
 
         {/* LOGIN BUTTON */}
@@ -274,6 +311,7 @@ function LoginForm() {
           disabled={loading}
           className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 hover:from-blue-700 hover:to-indigo-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
         >
+
           {loading ? (
             <>
               <Loader2
@@ -288,11 +326,14 @@ function LoginForm() {
               Sign In
             </>
           )}
+
         </button>
+
       </form>
 
       {/* DIVIDER */}
       <div className="flex items-center gap-4 my-7">
+
         <div className="flex-1 h-px bg-gray-200" />
 
         <span className="text-xs text-gray-400">
@@ -300,6 +341,7 @@ function LoginForm() {
         </span>
 
         <div className="flex-1 h-px bg-gray-200" />
+
       </div>
 
       {/* GOOGLE LOGIN */}
@@ -309,17 +351,20 @@ function LoginForm() {
         disabled={loading}
         className="w-full h-12 border border-gray-200 rounded-xl flex items-center justify-center gap-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition disabled:opacity-50"
       >
+
         <span className="text-lg font-bold">
           G
         </span>
 
         Continue with Google
+
       </button>
 
       {/* FOOTER */}
       <p className="text-center text-xs text-gray-400 mt-8">
         Authorized employees only
       </p>
+
     </div>
   );
 }

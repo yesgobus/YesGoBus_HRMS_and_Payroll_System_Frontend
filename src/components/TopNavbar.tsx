@@ -1,38 +1,50 @@
 
-import { ChevronDown, User, LogOut, Mail } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import {
+  ChevronDown,
+  User,
+  LogOut,
+  Mail,
+  Phone,
+  X,
+} from "lucide-react";
+
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function TopNavbar() {
-  const [openProfile, setOpenProfile] = useState(false)
-  const [employeeName, setEmployeeName] = useState("Employee")
-  const [role, setRole] = useState("Employee")
+  const [openProfile, setOpenProfile] = useState(false);
+  const [employeeName, setEmployeeName] = useState("Employee");
+  const [role, setRole] = useState("Employee");
+  const [showContact, setShowContact] = useState(false);
 
-  const profileRef = useRef<HTMLDivElement>(null)
-  const navigate = useNavigate()
+  const supportEmail = "support@yesgobus.com";
+  const supportPhone = "+91 8867750658";
+
+  const profileRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedEmployee =
       localStorage.getItem("employee") ||
-      sessionStorage.getItem("employee")
+      sessionStorage.getItem("employee");
 
     const storedRole =
       localStorage.getItem("role") ||
-      sessionStorage.getItem("role")
+      sessionStorage.getItem("role");
 
     if (storedEmployee) {
       try {
-        const employee = JSON.parse(storedEmployee)
+        const employee = JSON.parse(storedEmployee);
         setEmployeeName(
           employee.fullName || employee.name || "Employee"
-        )
+        );
       } catch {
-        setEmployeeName("Employee")
+        setEmployeeName("Employee");
       }
     }
 
     if (storedRole) {
-      setRole(storedRole)
+      setRole(storedRole);
     }
 
     // Close profile menu when clicking outside
@@ -41,16 +53,16 @@ function TopNavbar() {
         profileRef.current &&
         !profileRef.current.contains(event.target as Node)
       ) {
-        setOpenProfile(false)
+        setOpenProfile(false);
       }
-    }
+    };
 
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const initials = employeeName
     .trim()
@@ -58,18 +70,18 @@ function TopNavbar() {
     .slice(0, 2)
     .map((part) => part[0])
     .join("")
-    .toUpperCase()
+    .toUpperCase();
 
   // LOGOUT
   const handleLogout = () => {
     const storage = localStorage.getItem("employeeId")
       ? localStorage
-      : sessionStorage
+      : sessionStorage;
 
-    const employeeId = storage.getItem("employeeId")
+    const employeeId = storage.getItem("employeeId");
 
     if (employeeId) {
-      storage.removeItem(`attendance_${employeeId}`)
+      storage.removeItem(`attendance_${employeeId}`);
     }
 
     const keys = [
@@ -79,28 +91,22 @@ function TopNavbar() {
       "role",
       "visibleEmployees",
       "token",
-    ]
+    ];
 
     keys.forEach((key) => {
-      localStorage.removeItem(key)
-      sessionStorage.removeItem(key)
-    })
+      localStorage.removeItem(key);
+      sessionStorage.removeItem(key);
+    });
 
-    setOpenProfile(false)
-    navigate("/login", { replace: true })
-  }
-
-  // CONTACT HR
-  const handleContactUs = () => {
-    window.location.href =
-      "mailto:hr@ramblehr.com?subject=HR%20Support%20Request"
-  }
+    setOpenProfile(false);
+    navigate("/login", { replace: true });
+  };
 
   // OPEN EMPLOYEE INFORMATION
   const handleProfileClick = () => {
-    setOpenProfile(false)
-    navigate("/management/employees")
-  }
+    setOpenProfile(false);
+    navigate("/management/employees");
+  };
 
   return (
     <div className="flex h-16 items-center justify-between border-b border-gray-100 bg-white px-4 shadow-sm sm:px-6">
@@ -118,18 +124,110 @@ function TopNavbar() {
         </div>
       </div>
 
-      {/* RIGHT */}
-      <div className="flex items-center gap-4 sm:gap-6">
+      {/* RIGHT SECTION */}
+      <div className="flex items-center gap-2 sm:gap-4">
 
-        {/* CONTACT US */}
+        {/* CONTACT US BUTTON */}
         <button
           type="button"
-          onClick={handleContactUs}
+          onClick={() => setShowContact(true)}
           className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-blue-50 hover:text-blue-600"
         >
           <Mail size={17} />
           <span>Contact Us</span>
         </button>
+
+        {/* CONTACT DETAILS MODAL */}
+        {showContact && (
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
+
+            <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
+
+              {/* MODAL HEADER */}
+              <div className="flex items-center justify-between bg-indigo-600 p-5 text-white">
+                <div>
+                  <h2 className="text-lg font-bold">
+                    Contact Us
+                  </h2>
+                  <p className="text-sm text-indigo-100">
+                    Ramble Transport Private Limited
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowContact(false)}
+                  className="rounded-lg p-2 transition hover:bg-white/20"
+                  aria-label="Close contact details"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* CONTACT INFORMATION */}
+              <div className="space-y-4 p-6">
+
+                <p className="text-sm text-gray-500">
+                  For assistance and HR-related queries, contact our support team.
+                </p>
+
+                {/* EMAIL */}
+                <div className="flex items-center gap-4 rounded-xl border border-gray-200 p-4">
+                  <div className="rounded-lg bg-indigo-50 p-3">
+                    <Mail size={22} className="text-indigo-600" />
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="text-xs text-gray-500">
+                      Email Address
+                    </p>
+                    <p className="mt-1 break-all font-semibold text-gray-800">
+                      {supportEmail}
+                    </p>
+                  </div>
+                </div>
+
+                {/* PHONE */}
+                <div className="flex items-center gap-4 rounded-xl border border-gray-200 p-4">
+                  <div className="rounded-lg bg-green-50 p-3">
+                    <Phone size={22} className="text-green-600" />
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-gray-500">
+                      Contact Number
+                    </p>
+                    <p className="mt-1 font-semibold text-gray-800">
+                      {supportPhone}
+                    </p>
+                  </div>
+                </div>
+
+                {/* SUPPORT INFORMATION */}
+                <div className="rounded-xl bg-gray-50 p-4">
+                  <h3 className="text-sm font-semibold text-gray-800">
+                    HR Support
+                  </h3>
+
+                  <p className="mt-2 text-sm leading-6 text-gray-500">
+                    For attendance, leave management, payroll, payslips,
+                    employee information and other HR-related queries.
+                  </p>
+                </div>
+
+                {/* CLOSE BUTTON */}
+                <button
+                  type="button"
+                  onClick={() => setShowContact(false)}
+                  className="w-full rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
+                >
+                  Close
+                </button>
+
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* PROFILE */}
         <div className="relative" ref={profileRef}>
@@ -203,7 +301,7 @@ function TopNavbar() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default TopNavbar
+export default TopNavbar;
